@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace time_tracker_case.Contexts;
 
-public class IdentityDbContext : DbContext
+public class IdentityDbContext : IdentityDbContext<ApplicationUser>
 {
     protected readonly IConfiguration _configuration;
 
