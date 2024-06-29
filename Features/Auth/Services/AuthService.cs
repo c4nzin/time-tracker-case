@@ -55,11 +55,7 @@ public class AuthService : IAuthService
 
         if (await _userManager.CheckPasswordAsync(user, loginUserDto.Password))
         {
-            var authClaims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
+            var authClaims = new List<Claim> { new Claim(ClaimTypes.Sid, user.Id), };
 
             var authSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])
