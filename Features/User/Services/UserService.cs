@@ -31,11 +31,34 @@ public class UserService : IUserService
             .Value;
         var user = await _userManager.FindByIdAsync(userId);
 
-        Console.WriteLine(userId);
+        if (user == null)
+        {
+            throw new BadHttpRequestException("You are not logged in.");
+        }
+
+        return _mapper.Map<AuthenticatedUserDto>(user);
+    }
+
+    public async Task<AuthenticatedUserDto> UpdateAuthenticatedUser(UpdateUserDto updateUserDto)
+    {
+        var userId = _httpContextAccessor
+            .HttpContext!.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Sid)!
+            .Value;
+        var user = await _userManager.FindByIdAsync(userId);
 
         if (user == null)
         {
             throw new BadHttpRequestException("You are not logged in.");
+        }
+
+        user.UserName = updateUserDto.Username;
+        user.NormalizedUserName = updateUserDto.Username.ToUpper(); //burasi gerekli olmayabilir?
+
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            throw new Exception("User update failed.");
         }
 
         return _mapper.Map<AuthenticatedUserDto>(user);

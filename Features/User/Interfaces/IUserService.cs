@@ -4,5 +4,6 @@ namespace time_tracker_case;
 
 public interface IUserService
 {
-    public Task<AuthenticatedUserDto> GetAuthenticatedUser();
+    Task<AuthenticatedUserDto> GetAuthenticatedUser();
+    Task<AuthenticatedUserDto> UpdateAuthenticatedUser(UpdateUserDto updateUserDto);
 }
