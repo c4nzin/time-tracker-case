@@ -1,40 +1,89 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
-namespace time_tracker_case.Services
+namespace time_tracker_case.Services;
+
+public class AuthService : IAuthService
 {
-    public class AuthService : IAuthService
-    {
-        private readonly UserManager<ApplicationUser> _userManager;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-        public AuthService(UserManager<ApplicationUser> userManager)
+    private readonly IConfiguration _configuration;
+
+    public AuthService(UserManager<ApplicationUser> userManager, IConfiguration configuration)
+    {
+        _userManager = userManager;
+        _configuration = configuration;
+    }
+
+    public async Task<IActionResult> Register(RegisterUserDto registerUserDto)
+    {
+        var userExists = await _userManager.FindByNameAsync(registerUserDto.Username);
+
+        if (userExists != null)
         {
-            _userManager = userManager;
+            return new BadRequestObjectResult("User is already registered.");
         }
 
-        public async Task<IActionResult> Register(RegisterUserDto registerUserDto)
+        var user = new ApplicationUser()
         {
-            var userExists = await _userManager.FindByNameAsync(registerUserDto.Username);
+            Email = registerUserDto.Email,
+            SecurityStamp = Guid.NewGuid().ToString(),
+            UserName = registerUserDto.Username
+        };
 
-            if (userExists != null)
-            {
-                return new BadRequestObjectResult("User is already registered.");
-            }
+        var result = await _userManager.CreateAsync(user, registerUserDto.Password);
+        if (!result.Succeeded)
+        {
+            return new BadRequestObjectResult("Check your credentials.");
+        }
 
-            ApplicationUser user = new ApplicationUser()
+        return new OkObjectResult("User created.");
+    }
+
+    public async Task<IActionResult> Login(LoginUserDto loginUserDto)
+    {
+        var user = await _userManager.FindByNameAsync(loginUserDto.Username);
+
+        if (user is null)
+        {
+            return new BadRequestObjectResult("Check your credentials.");
+        }
+
+        if (await _userManager.CheckPasswordAsync(user, loginUserDto.Password))
+        {
+            var authClaims = new List<Claim>
             {
-                Email = registerUserDto.Email,
-                SecurityStamp = Guid.NewGuid().ToString(),
-                UserName = registerUserDto.Username
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            var result = await _userManager.CreateAsync(user, registerUserDto.Password);
-            if (!result.Succeeded)
-            {
-                return new BadRequestObjectResult("Check your credentials.");
-            }
+            var authSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])
+            );
 
-            return new OkObjectResult("User created.");
+            var token = new JwtSecurityToken(
+                issuer: _configuration["JWT:ValidIssuer"],
+                audience: _configuration["JWT:ValidAudience"],
+                expires: DateTime.Now.AddHours(3),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(
+                    authSigningKey,
+                    SecurityAlgorithms.HmacSha256
+                )
+            );
+
+            return new OkObjectResult(
+                new
+                {
+                    token = new JwtSecurityTokenHandler().WriteToken(token),
+                    expiration = token.ValidTo
+                }
+            );
         }
+        throw new UnauthorizedAccessException("Unauthorized");
     }
 }
