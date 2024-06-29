@@ -22,4 +22,16 @@ public class UserController : ControllerBase
     {
         return await _userService.GetAuthenticatedUser();
     }
+
+    [HttpPut("me")]
+    public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto updateUserDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var updatedUser = await _userService.UpdateAuthenticatedUser(updateUserDto);
+        return Ok(updatedUser);
+    }
 }
