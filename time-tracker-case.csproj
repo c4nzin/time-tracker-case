@@ -24,4 +24,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\User\" />
+    <Folder Include="Features\User\Entities\" />
+  </ItemGroup>
+
 </Project>
