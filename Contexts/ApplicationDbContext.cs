@@ -20,4 +20,5 @@ public class IdentityDbContext : IdentityDbContext<ApplicationUser>
     }
 
     public DbSet<TimeRecord> TimeRecords { get; set; }
+    public DbSet<Project> Projects { get; set; }
 }
