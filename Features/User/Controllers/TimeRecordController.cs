@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using time_tracker_case.Models;
 
 namespace time_tracker_case.Controllers;
 
@@ -27,5 +28,11 @@ public class TimeRecordController : ControllerBase
         var timeRecord = await _timeRecordService.CreateTimeRecord(createTimeRecordDto);
 
         return Ok(timeRecord);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetTimeRecords([FromBody] string projectId)
+    {
+        await _timeRecordService.GetTimeRecords(projectId);
     }
 }

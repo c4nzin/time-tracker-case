@@ -31,7 +31,7 @@ public class TimeRecordService : ITimeRecordService
         }
 
         var project = await _context.Projects.FirstOrDefaultAsync(p =>
-            p.Id == authenticatedUser.Id
+            p.UserId == authenticatedUser.Id
         );
         if (project == null || project.UserId != authenticatedUser.Id)
         {
@@ -61,5 +61,36 @@ public class TimeRecordService : ITimeRecordService
         await _context.SaveChangesAsync();
 
         return timeRecord;
+    }
+
+    public async Task<List<TimeRecord>> GetTimeRecords(string projectId)
+    {
+        var authenticatedUser = await _userService.GetAuthenticatedUser();
+        if (authenticatedUser == null)
+        {
+            throw new UnauthorizedAccessException("User not authenticated.");
+        }
+
+        var project = await _context.Projects.FirstOrDefaultAsync(p =>
+            p.UserId == authenticatedUser.Id
+        );
+
+        if (project == null)
+        {
+            throw new UnauthorizedAccessException("No project found.");
+        }
+
+        if (project.UserId != authenticatedUser.Id)
+        {
+            throw new UnauthorizedAccessException(
+                "The Project not belong to the authenticated user"
+            );
+        }
+
+        var timeRecords = await _context
+            .TimeRecords.Where(table => table.ProjectId.ToString() == projectId)
+            .ToListAsync();
+
+        return timeRecords;
     }
 }
