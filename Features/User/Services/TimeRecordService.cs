@@ -63,7 +63,7 @@ public class TimeRecordService : ITimeRecordService
         return timeRecord;
     }
 
-    public async Task<List<TimeRecord>> GetTimeRecords(string projectId)
+    public async Task<List<TimeRecord>> GetTimeRecords(Guid projectId)
     {
         var authenticatedUser = await _userService.GetAuthenticatedUser();
         if (authenticatedUser == null)
@@ -88,7 +88,7 @@ public class TimeRecordService : ITimeRecordService
         }
 
         var timeRecords = await _context
-            .TimeRecords.Where(table => table.ProjectId.ToString() == projectId)
+            .TimeRecords.Where(table => table.ProjectId == projectId)
             .ToListAsync();
 
         return timeRecords;

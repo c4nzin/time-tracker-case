@@ -31,8 +31,8 @@ public class TimeRecordController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetTimeRecords([FromBody] string projectId)
+    public async Task<IActionResult> GetTimeRecords([FromBody] Guid projectId)
     {
-        await _timeRecordService.GetTimeRecords(projectId);
+        return (IActionResult)_timeRecordService.GetTimeRecords(projectId);
     }
 }
