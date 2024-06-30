@@ -21,12 +21,12 @@ public class ProjectService : IProjectService
             p.Name == createProjectDto.Name
         );
 
-        var user = await _userService.GetAuthenticatedUser();
-
         if (existingProject != null)
         {
             throw new Exception("A project with the same name already exists.");
         }
+
+        var user = await _userService.GetAuthenticatedUser();
 
         var newProject = new Project { Name = createProjectDto.Name, UserId = user.Id };
 

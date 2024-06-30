@@ -2,4 +2,4 @@
 
 namespace time_tracker_case;
 
-public class ApplicationUser : IdentityUser { }
+public class ApplicationUser : IdentityUser<Guid> { }

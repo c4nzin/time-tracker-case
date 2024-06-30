@@ -48,6 +48,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITimeRecordService, TimeRecordService>();
 
 builder.Services.AddDbContext<IdentityDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
@@ -56,7 +57,7 @@ builder.Services.AddDbContext<IdentityDbContext>(options =>
 builder.Services.AddHttpContextAccessor();
 
 builder
-    .Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<IdentityDbContext>()
     .AddDefaultTokenProviders();
 

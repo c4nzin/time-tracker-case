@@ -16,23 +16,25 @@ public class TimeRecordController : ControllerBase
 
     [HttpPost]
     public async Task<IActionResult> CreateTimeRecord(
-        [FromBody] CreateTimeRecordDto createTimeRecordDto
+        [FromBody] CreateTimeRecordDto createTimeRecordDto,
+        Guid projectId
     )
     {
         if (!ModelState.IsValid)
         {
             return BadRequest("Invalid body.");
         }
-        // if (createTimeRecordDto == null) { }
 
-        var timeRecord = await _timeRecordService.CreateTimeRecord(createTimeRecordDto);
+        var timeRecord = await _timeRecordService.CreateTimeRecord(createTimeRecordDto, projectId);
 
         return Ok(timeRecord);
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetTimeRecords([FromBody] Guid projectId)
+    public async Task<IActionResult> GetTimeRecords([FromQuery] Guid projectId)
     {
-        return (IActionResult)_timeRecordService.GetTimeRecords(projectId);
+        var getAllTimeRecords = await _timeRecordService.GetTimeRecords(projectId);
+
+        return Ok(getAllTimeRecords);
     }
 }
