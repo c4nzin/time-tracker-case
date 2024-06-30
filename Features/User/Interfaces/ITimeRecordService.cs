@@ -4,6 +4,6 @@ namespace time_tracker_case;
 
 public interface ITimeRecordService
 {
-    Task<TimeRecord> CreateTimeRecord(CreateTimeRecordDto createTimeRecordDto);
+    Task<TimeRecord> CreateTimeRecord(CreateTimeRecordDto createTimeRecordDto, Guid projectId);
     Task<List<TimeRecord>> GetTimeRecords(Guid projectId);
 }

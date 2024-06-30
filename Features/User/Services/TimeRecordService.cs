@@ -17,39 +17,36 @@ public class TimeRecordService : ITimeRecordService
         _userService = userService;
     }
 
-    public async Task<TimeRecord> CreateTimeRecord(CreateTimeRecordDto createTimeRecordDto)
+    public async Task<TimeRecord> CreateTimeRecord(
+        CreateTimeRecordDto createTimeRecordDto,
+        Guid projectId
+    )
     {
         var authenticatedUser = await _userService.GetAuthenticatedUser();
-        if (authenticatedUser == null)
-        {
-            throw new UnauthorizedAccessException("User not authenticated.");
-        }
 
         if (createTimeRecordDto.StartDate > createTimeRecordDto.EndDate)
         {
             throw new BadHttpRequestException("Invalid date.");
         }
 
-        var project = await _context.Projects.FirstOrDefaultAsync(p =>
-            p.UserId == authenticatedUser.Id
-        );
-        if (project == null || project.UserId != authenticatedUser.Id)
+        var project = await _context.Projects.FirstOrDefaultAsync(p => p.Id == projectId);
+        if (project == null)
         {
             throw new UnauthorizedAccessException(
                 "The Project not belong to the authenticated user or its just not exists"
             );
+            // 6aae770b-6add-4ebf-9776-d9d8ff506ddd project id
         }
 
-        var hoursWorked = (
+        var workedInMinutes = (
             createTimeRecordDto.EndDate - createTimeRecordDto.StartDate
         ).TotalMinutes;
 
-        var hoursWorkedInHours = hoursWorked / 60;
+        var hoursWorkedInHours = workedInMinutes / 60;
         var profit = createTimeRecordDto.HourlyRate * hoursWorkedInHours;
 
         var timeRecord = new TimeRecord
         {
-            Id = Guid.NewGuid(),
             ProjectId = project.Id,
             StartDate = createTimeRecordDto.StartDate,
             EndDate = createTimeRecordDto.EndDate,
@@ -66,14 +63,8 @@ public class TimeRecordService : ITimeRecordService
     public async Task<List<TimeRecord>> GetTimeRecords(Guid projectId)
     {
         var authenticatedUser = await _userService.GetAuthenticatedUser();
-        if (authenticatedUser == null)
-        {
-            throw new UnauthorizedAccessException("User not authenticated.");
-        }
 
-        var project = await _context.Projects.FirstOrDefaultAsync(p =>
-            p.UserId == authenticatedUser.Id
-        );
+        var project = await _context.Projects.FirstOrDefaultAsync(p => p.Id == projectId);
 
         if (project == null)
         {
