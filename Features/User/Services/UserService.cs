@@ -1,10 +1,7 @@
 using System.Security.Claims;
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using time_tracker_case;
-using time_tracker_case.Services;
 
 public class UserService : IUserService
 {
@@ -52,7 +49,6 @@ public class UserService : IUserService
         }
 
         user.UserName = updateUserDto.Username;
-        user.NormalizedUserName = updateUserDto.Username.ToUpper(); //burasi gerekli olmayabilir?
 
         var result = await _userManager.UpdateAsync(user);
 
