@@ -37,4 +37,23 @@ public class TimeRecordController : ControllerBase
 
         return Ok(getAllTimeRecords);
     }
+
+    [HttpGet("filter")]
+    public async Task<IActionResult> FilterTimeRecords(
+        [FromQuery] FilterTimeRecordDto filterTimeRecordDto,
+        Guid projectId
+    )
+    {
+        if (filterTimeRecordDto.StartDate > filterTimeRecordDto.EndDate)
+        {
+            return BadRequest("Invalid date.");
+        }
+
+        var filteredTimeRecords = await _timeRecordService.FilterTimeRecords(
+            filterTimeRecordDto,
+            projectId
+        );
+
+        return Ok(filteredTimeRecords);
+    }
 }

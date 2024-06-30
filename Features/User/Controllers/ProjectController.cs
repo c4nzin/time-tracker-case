@@ -27,4 +27,17 @@ public class ProjectController : ControllerBase
         var project = await _projectService.CreateProject(createProjectDto);
         return Ok(project);
     }
+
+    [HttpGet("{projectId:guid}")]
+    public async Task<IActionResult> GetProjectById(Guid projectId)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest("Invalid project ID.");
+        }
+
+        var project = await _projectService.GetProjectById(projectId);
+
+        return Ok(project);
+    }
 }

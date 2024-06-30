@@ -35,4 +35,27 @@ public class ProjectService : IProjectService
 
         return createProjectDto;
     }
+
+    public async Task<ProjectDetails> GetProjectById(Guid projectId)
+    {
+        List<double> numbers = new List<double>();
+
+        var user = await _userService.GetAuthenticatedUser();
+
+        var project = await _context.Projects.FirstOrDefaultAsync(p =>
+            p.Id == projectId && p.UserId == user.Id
+        );
+        if (project == null)
+        {
+            throw new BadHttpRequestException("Project not found or access denied.");
+        }
+
+        var records = await _context
+            .TimeRecords.Where(table => table.ProjectId == project.Id)
+            .ToListAsync();
+
+        var totalProfit = records.Sum(tp => tp.Profit);
+
+        return new ProjectDetails { Project = project, TotalProfit = totalProfit };
+    }
 }

@@ -84,4 +84,36 @@ public class TimeRecordService : ITimeRecordService
 
         return timeRecords;
     }
+
+    public async Task<List<TimeRecord>> FilterTimeRecords(
+        FilterTimeRecordDto filterTimeRecordDto,
+        Guid projectId
+    )
+    {
+        var authenticatedUser = await _userService.GetAuthenticatedUser();
+
+        var project = await _context.Projects.FirstOrDefaultAsync(p => p.Id == projectId);
+
+        if (project == null)
+        {
+            throw new UnauthorizedAccessException("No project found.");
+        }
+
+        if (project.UserId != authenticatedUser.Id)
+        {
+            throw new UnauthorizedAccessException(
+                "The Project not belong to the authenticated user"
+            );
+        }
+
+        var timeRecords = await _context
+            .TimeRecords.Where(query =>
+                query.ProjectId == projectId
+                && query.StartDate >= filterTimeRecordDto.StartDate
+                && query.EndDate <= filterTimeRecordDto.EndDate
+            )
+            .ToListAsync();
+
+        return timeRecords;
+    }
 }
