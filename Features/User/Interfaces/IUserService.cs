@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace time_tracker_case;
+﻿namespace time_tracker_case;
 
 public interface IUserService
 {
