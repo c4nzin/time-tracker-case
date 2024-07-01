@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using time_tracker_case.Contexts;
 using time_tracker_case.Models;
 
@@ -11,13 +12,16 @@ public class TimeRecordService : ITimeRecordService
     private readonly IdentityDbContext _context;
     private readonly IUserService _userService;
 
-    public TimeRecordService(IdentityDbContext context, IUserService userService)
+    private readonly IMapper _mapper;
+
+    public TimeRecordService(IdentityDbContext context, IUserService userService, IMapper mapper)
     {
         _context = context;
         _userService = userService;
+        _mapper = mapper;
     }
 
-    public async Task<TimeRecord> CreateTimeRecord(
+    public async Task<CreateTimeRecordDto> CreateTimeRecord(
         CreateTimeRecordDto createTimeRecordDto,
         Guid projectId
     )
@@ -35,7 +39,6 @@ public class TimeRecordService : ITimeRecordService
             throw new UnauthorizedAccessException(
                 "The Project not belong to the authenticated user or its just not exists"
             );
-            // 6aae770b-6add-4ebf-9776-d9d8ff506ddd project id
         }
 
         var workedInMinutes = (
@@ -57,7 +60,7 @@ public class TimeRecordService : ITimeRecordService
         _context.TimeRecords.Add(timeRecord);
         await _context.SaveChangesAsync();
 
-        return timeRecord;
+        return _mapper.Map<CreateTimeRecordDto>(timeRecord);
     }
 
     public async Task<List<TimeRecord>> GetTimeRecords(Guid projectId)
@@ -82,6 +85,7 @@ public class TimeRecordService : ITimeRecordService
             .TimeRecords.Where(table => table.ProjectId == projectId)
             .ToListAsync();
 
+        //TODO : add mapping
         return timeRecords;
     }
 
