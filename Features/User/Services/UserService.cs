@@ -57,6 +57,6 @@ public class UserService : IUserService
             throw new Exception("User update failed.");
         }
 
-        return _mapper.Map<AuthenticatedUserDto>(user);
+        return _mapper.Map<AuthenticatedUserDto>(result);
     }
 }
