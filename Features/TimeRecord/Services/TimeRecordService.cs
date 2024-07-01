@@ -97,7 +97,6 @@ public class TimeRecordService : ITimeRecordService
         var authenticatedUser = await _userService.GetAuthenticatedUser();
 
         var project = await _context.Projects.FirstOrDefaultAsync(p => p.Id == projectId);
-
         if (project == null)
         {
             throw new UnauthorizedAccessException("No project found.");
@@ -113,8 +112,12 @@ public class TimeRecordService : ITimeRecordService
         var timeRecords = await _context
             .TimeRecords.Where(query =>
                 query.ProjectId == projectId
-                && query.StartDate >= filterTimeRecordDto.StartDate
-                && query.EndDate <= filterTimeRecordDto.EndDate
+                && (
+                    (
+                        query.StartDate <= filterTimeRecordDto.EndDate
+                        && query.EndDate >= filterTimeRecordDto.StartDate
+                    )
+                )
             )
             .ToListAsync();
 
