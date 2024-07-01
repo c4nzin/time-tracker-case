@@ -11,6 +11,8 @@ using time_tracker_case.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(TimeRecordMappingProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(ProjectMappingProfile).Assembly);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

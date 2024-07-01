@@ -7,6 +7,5 @@ public class MappingProfile : Profile
     public MappingProfile()
     {
         CreateMap<ApplicationUser, AuthenticatedUserDto>();
-        CreateMap<TimeRecord, CreateTimeRecordDto>();
     }
 }
