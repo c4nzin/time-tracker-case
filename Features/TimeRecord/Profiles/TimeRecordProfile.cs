@@ -6,6 +6,6 @@ public class TimeRecordMappingProfile : Profile
 {
     public TimeRecordMappingProfile()
     {
-        CreateMap<TimeRecord, CreateTimeRecordDto>();
+        CreateMap<CreateTimeRecordDto, TimeRecord>();
     }
 }

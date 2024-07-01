@@ -6,6 +6,6 @@ public class ProjectMappingProfile : Profile
 {
     public ProjectMappingProfile()
     {
-        CreateMap<Project, CreateProjectDto>();
+        CreateMap<CreateProjectDto, Project>();
     }
 }
