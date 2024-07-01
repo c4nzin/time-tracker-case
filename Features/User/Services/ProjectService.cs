@@ -17,21 +17,11 @@ public class ProjectService : IProjectService
 
     public async Task<CreateProjectDto> CreateProject(CreateProjectDto createProjectDto)
     {
-        var existingProject = await _context.Projects.FirstOrDefaultAsync(p =>
-            p.Name == createProjectDto.Name
-        );
-
-        if (existingProject != null)
-        {
-            throw new Exception("A project with the same name already exists.");
-        }
+        await EnsureProjectExists(createProjectDto.Name);
 
         var user = await _userService.GetAuthenticatedUser();
 
-        var newProject = new Project { Name = createProjectDto.Name, UserId = user.Id };
-
-        _context.Projects.Add(newProject);
-        await _context.SaveChangesAsync();
+        await GenerateProject(createProjectDto.Name, user.Id);
 
         return createProjectDto;
     }
@@ -57,5 +47,24 @@ public class ProjectService : IProjectService
         var totalProfit = records.Sum(tp => tp.Profit);
 
         return new ProjectDetails { Project = project, TotalProfit = totalProfit };
+    }
+
+    private async Task EnsureProjectExists(string projectName)
+    {
+        var existingProject = await _context.Projects.FirstOrDefaultAsync(p =>
+            p.Name == projectName
+        );
+
+        if (existingProject != null)
+        {
+            throw new Exception("A project with the same name already exists.");
+        }
+    }
+
+    private async Task GenerateProject(string name, Guid userId)
+    {
+        var generatedProject = new Project { Name = name, UserId = userId };
+        _context.Projects.Add(generatedProject);
+        await _context.SaveChangesAsync();
     }
 }
